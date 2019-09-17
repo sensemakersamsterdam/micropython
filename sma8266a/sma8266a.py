@@ -14,7 +14,7 @@ class SMABoard:
     G_LED_PIN = const(4)
 
 
-class Oled(SSD1306_I2C):
+class display(SSD1306_I2C):
     def __init__(self, *args, line_hight=9):
         super().__init__(*args)
         self._line = 0
@@ -150,13 +150,14 @@ class WiFi:
         return self.wlan_status()
 
 
-def setup_standard(mqtt=False, dht11=True, oled_initial='Sensemakers\nESP8266 board\n\nReady...'):
-    global i2c, oled, led, sensor
+def setup_standard(mqtt=False, dht11=True,
+                   display_initial='Sensemakers\nESP8266 board\n\nReady...'):
+    global i2c, display, led, sensor
     i2c = I2C(sda=Pin(SMABoard.SDA_PIN), scl=Pin(SMABoard.SCL_PIN))
-    oled = Oled(128, 64, i2c)
+    display = display(128, 64, i2c)
     led = Led()
     sensor = Sensor()
-    lines = oled_initial.split('\n')
+    lines = display_initial.split('\n')
     for line in lines:
-        oled.print(line)
-    return i2c, oled, led, sensor 
+        display.print(line)
+    return i2c, display, led, sensor
