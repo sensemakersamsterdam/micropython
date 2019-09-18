@@ -2,7 +2,7 @@ from sma8266a import *
 from won import *
 from time import sleep
 
-i2c, display, led, sensor = setup_standard()
+i2c, display, led, sensor, board_id = setup_standard()
 
 display.clear()
 display.print('Connecting...')

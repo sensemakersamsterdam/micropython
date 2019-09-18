@@ -5,6 +5,7 @@ from ssd1306 import SSD1306_I2C
 from dht import DHT11
 import network
 from utime import sleep_ms
+import ubinascii
 
 
 class SMABoard:
@@ -14,7 +15,7 @@ class SMABoard:
     G_LED_PIN = const(4)
 
 
-class display(SSD1306_I2C):
+class Display(SSD1306_I2C):
     def __init__(self, *args, line_hight=9):
         super().__init__(*args)
         self._line = 0
@@ -26,7 +27,11 @@ class display(SSD1306_I2C):
         self._line = 0
 
     def print(self, *args, sep=' '):
-        ftxt = sep.join([str(i) for i in args])
+        ftxts = sep.join([str(i) for i in args]).split('\n')
+        for ftxt in ftxts:
+            self._print1(ftxt, sep)
+
+    def _print1(self, ftxt, sep):
         line = self._line
         lh = self.line_hight
         last_l = int(64 / lh) - 1
@@ -151,13 +156,13 @@ class WiFi:
 
 
 def setup_standard(mqtt=False, dht11=True,
-                   display_initial='Sensemakers\nESP8266 board\n\nReady...'):
-    global i2c, display, led, sensor
+                   banner='Sensemakers\nESP8266 board\n\nReady...'):
     i2c = I2C(sda=Pin(SMABoard.SDA_PIN), scl=Pin(SMABoard.SCL_PIN))
-    display = display(128, 64, i2c)
+    display = Display(128, 64, i2c)
     led = Led()
     sensor = Sensor()
-    lines = display_initial.split('\n')
-    for line in lines:
-        display.print(line)
-    return i2c, display, led, sensor
+    board_id = 'SMA-%s' % ubinascii.hexlify(network.WLAN(
+        network.STA_IF).config("mac")[-3:]).decode('utf-8').upper()
+    display.print(board_id)
+    display.print(banner)
+    return i2c, display, led, sensor, board_id
