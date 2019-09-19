@@ -4,8 +4,10 @@ from machine import I2C, Pin
 from ssd1306 import SSD1306_I2C
 from dht import DHT11
 import network
-from utime import sleep_ms
+import utime
 import ubinascii
+import ntptime
+import machine
 
 
 class SMABoard:
@@ -122,7 +124,7 @@ class WiFi:
 
     def _wlan_wait(self, wait=10):
         for t in range(wait*2):
-            sleep_ms(500)
+            utime.sleep_ms(500)
             _, _, conn = self.wlan_status()
             if conn:
                 break
@@ -153,6 +155,39 @@ class WiFi:
         if wait:
             self._wlan_wait(wait)
         return self.wlan_status()
+
+
+class SMA_TimeError(Exception):
+    pass
+
+
+UTC_NTP_DELTA = ntptime.NTP_DELTA
+
+
+class SMA_Time:
+
+    def __init__(self, offset=0):
+        self._seconds_offset = 3600 * offset
+
+    def sync_time(self):
+        if not (network.WLAN(network.STA_IF).active() |
+                network.WLAN(network.AP_IF).active()):
+            raise SMA_TimeError('No connection')
+        ntptime.NTP_DELTA = UTC_NTP_DELTA - self._seconds_offset
+        for i in range(10):
+            try:
+                ntptime.settime()
+                return
+            except OSError as e:
+                utime.sleep_ms(1000)
+        raise SMA_TimeError('Cannot get internet time.')
+
+    def date_time_str(self):
+        now = utime.localtime()
+        y, m, d = now[0:3]
+        ds = '%02d/%02d/%04d' % (d, m, y)
+        ts = '%02d:%02d:%02d' % now[3:6]
+        return ds, ts
 
 
 def setup_standard(mqtt=False, dht11=True,

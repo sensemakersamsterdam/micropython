@@ -1,5 +1,5 @@
 from sma8266a import *
-from wifi_credentials import *
+from credentials import *
 from mqtt.robust import MQTTClient
 import ubinascii
 import json
@@ -28,8 +28,8 @@ def wifi_ip():
 class SMA_Backend:
     def __init__(self, sensor_id):
         self._sensor_id = sensor_id
-        self._mqtt_client = MQTTClient(sensor_id, 'mqtt.sensemakersams.org',
-                                       port=9998, user='WON', password='won1234')
+        self._mqtt_client = MQTTClient(sensor_id, my_mqtt_host,
+                                       port=9998, user=my_mqtt_user, password=my_mqtt_password)
         self._mqtt_client.connect()
         self._topic = 'pipeline/WON/' + sensor_id
         self._template = '{"app_id":"WON", "dev_id": "' + \
