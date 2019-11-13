@@ -4,7 +4,7 @@ from machine import Pin
 from time import sleep_ms, ticks_ms
 
 
-NPX_PIN = 5     # this is the DHT socket on the Sensemakers board
+NPX_PIN = 3     # this is the DHT socket on the Sensemakers board
 NPX_LEN = 60
 ring = npx.NeoPixel(Pin(NPX_PIN), NPX_LEN)
 
