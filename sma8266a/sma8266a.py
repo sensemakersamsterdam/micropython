@@ -195,9 +195,20 @@ def setup_standard(mqtt=False, dht11=True,
     i2c = I2C(sda=Pin(SMABoard.SDA_PIN), scl=Pin(SMABoard.SCL_PIN))
     display = Display(128, 64, i2c)
     led = Led()
-    sensor = Sensor()
+    if dht11:
+        sensor = Sensor()
+    else:
+        sensor = None
     board_id = 'SMA-%s' % ubinascii.hexlify(network.WLAN(
         network.STA_IF).config("mac")[-3:]).decode('utf-8').upper()
     display.print(board_id)
     display.print(banner)
     return i2c, display, led, sensor, board_id
+
+
+def execfile(f):
+    """Run a python file from the local file system
+    """
+    fname = f if f.endswith('.py') else f + '.py'
+    with open(fname) as xfile:
+        exec(xfile.read(),locals(),locals())
