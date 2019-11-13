@@ -73,15 +73,16 @@ class Sensor:
         self._measure()  # discard first measurement
 
     def _measure(self):
-        for _ in range(5):
+        for _ in range(10):
             try:
                 self._dht.measure()
                 break
             except Exception:
-                pass    # ignore occasional failure
+                # in case of failure wait a bit and try again
+                utime.sleep_ms(500)
         else:
-            raise RuntimeError
-            ('Cannot get sensor data')
+            # 10 misses....
+            raise RuntimeError('Cannot get sensor data')
 
     def temperature(self):
         self._measure()

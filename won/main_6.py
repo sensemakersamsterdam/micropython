@@ -45,21 +45,25 @@ led = Led()
 
 while True:     # Repeat the below forever....
     led.on()
-    t = sensor.temperature()        # Get the current temperature
-    h = sensor.humidity()           # Get the humidity
     dt, tm = clock.date_time_str()  # Get date and time
 
-    # Display the lot
+    # Display the intro
     display.clear()
     display.print('IP:', ip, sep='')
     display.print('ID:', board_id, sep='')
     display.print('---------------')
     display.print(dt)
     display.print(tm)
-    display.print(t, 'C,', h, '%H')
 
-    # Send it to the backend
-    sma.send(temp=t, hum=h)
+    # Get the current temperature and humidity
+    try:
+        t, h = sensor.all()
+        display.print(t, 'C,', h, '%H')
+        # Send it to the backend
+        sma.send(temp=t, hum=h)
+    except Exception:
+        display.print('Sensor fail!')
+        sma.send(fail=1)
 
     # and wait some seconds before we do it all again
     led.off()
