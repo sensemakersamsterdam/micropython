@@ -37,3 +37,4 @@ def showtime(r, pat=(100, 0, 0), delay=100, loops=10):
 if __name__ == '__main__':
     print('Neopixel Demo')
     showtime(ring, (100, 0, 60), 10)
+
